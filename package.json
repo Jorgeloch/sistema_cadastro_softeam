@@ -1,0 +1,20 @@
+{
+  "name": "sistema-da-cadastro-softeam",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jorgeloch/sistema_cadastro_softeam.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jorgeloch/sistema_cadastro_softeam/issues"
+  },
+  "homepage": "https://github.com/Jorgeloch/sistema_cadastro_softeam#readme"
+}
