@@ -1,12 +1,29 @@
 const express = require('express');
+const Collaborators = require('../models/collaborator');
 const router = express.Router();
 
 router.get('/', (request, response) => {
-    return response.send({message: "tudo ok com o metodo GET da rota de colaboradores"});
+    Collaborators.find({}, (err, data) => {
+        if (err) return response.send({ error: `Error trying to connect to the database: ${err}` });
+        return response.send(data);
+    })
 });
 
-router.post('/', (request, response) => {
-    return response.send({message: "tudo ok com o metodo POST da rota de colaboradores"});
+router.post('/create', (request, response) => {
+    const { id, name, email, password, role } = request.body;
+
+    if (!id || !name || !email || !password || !role) return response.send({ error: "Insufficient Data!" });
+
+    Collaborators.findOne({id}, (err, data) => {
+        if (err) return response.send({ error: `Error trying to find collaborator: ${err}` });
+        if (data) return response.send({ error: 'Collaborator already exist!' });
+
+        Collaborators.create(request.body, (err, data) => {
+            if (err) return response.send({ error: `Error trying to create collaborator: ${err}`});
+            data.password = undefined;
+            return data;
+        });
+    });
 });
 
 module.exports = router;
