@@ -25,4 +25,12 @@ router.post('/create', (request, response) => {
     });
 });
 
+router.delete('/delete', (request, response) => {
+    const {id} = request.body;
+    Projects.findOneAndDelete({id}, (err, data) => {
+        if(err) return response.send(`Error trying to delete project: ${err}`);
+        return response.send(data);
+    });
+});
+
 module.exports = router;

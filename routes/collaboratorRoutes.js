@@ -26,4 +26,12 @@ router.post('/create', (request, response) => {
     });
 });
 
+router.delete('/delete', (request, response) => {
+    const {id} = request.body;
+    Collaborators.findOneAndDelete({id}, (err, data) => {
+        if(err) return response.send(`Error trying to delete collaborator: ${err}`);
+        return response.send(data);
+    });
+});
+
 module.exports = router;
