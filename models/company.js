@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const collaboratorSchema = new Schema({
+const companySchema = new Schema({
     id: { type: String, required: true, unique: true },
     name: { type: String, required: true, uppercase: true },
     address: { type: String, required: true, unique: true,  lowercase: true }, 
@@ -9,4 +9,4 @@ const collaboratorSchema = new Schema({
     phone: { type: Number, required: true }
 });
 
-module.exports = mongoose.model('Company', collaboratorSchema);
+module.exports = mongoose.model('Company', companySchema);
