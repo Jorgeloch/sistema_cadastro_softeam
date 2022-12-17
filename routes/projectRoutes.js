@@ -20,8 +20,7 @@ router.post('/create', (request, response) => {
 
         Projects.create(request.body, (err, data) => {
             if (err) return response.send({ error: `Error trying to create project: ${err}`});
-            data.password = undefined;
-            return data;
+            return response.send(data);
         });
     });
 });

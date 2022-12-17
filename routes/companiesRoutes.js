@@ -20,7 +20,7 @@ router.post('/create', (request, response) => {
 
         Companies.create(request.body, (err, data) => {
             if (err) return response.send({ error: `Error trying to create company: ${err}`});
-            return data;
+            return response.send(data);
         });
     });
 });
