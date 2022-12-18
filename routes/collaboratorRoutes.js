@@ -12,7 +12,9 @@ router.get('/', (request, response) => {
 router.post('/create', (request, response) => {
     const { id, name, email, password, role } = request.body;
 
-    if (!id || !name || !email || !password || !role) return response.send({ error: "Insufficient Data!" });
+    if (!id || !name || !email || !password || !role) {
+        return response.send({ error: "Insufficient Data!" });
+    }
 
     Collaborators.findOne({id}, (err, data) => {
         if (err) return response.send({ error: `Error trying to find collaborator: ${err}` });

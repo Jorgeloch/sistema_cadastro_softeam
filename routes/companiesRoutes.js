@@ -12,7 +12,9 @@ router.get('/', (request, response) => {
 router.post('/create', (request, response) => {
     const { id, name, address, CNPJ, phone } = request.body;
 
-    if (!id || !name || !address || !CNPJ || !phone) return response.send({ error: "Insufficient Data!" });
+    if (!id || !name || !address || !CNPJ || !phone) {
+        return response.send({ error: "Insufficient Data!" });
+    };
 
     Companies.findOne({id}, (err, data) => {
         if (err) return response.send({ error: `Error trying to find company: ${err}` });

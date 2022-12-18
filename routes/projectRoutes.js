@@ -12,7 +12,9 @@ router.get('/', (request, response) => {
 router.post('/create', (request, response) => {
     const { id, name, description, status, value, collaborators, companies } = request.body;
 
-    if (!id || !name || !description || !status || !value || !collaborators || !companies) return response.send({ error: "Insufficient Data!" });
+    if (!id || !name || !description || !status || !value || !collaborators || !companies) {
+        return response.send({ error: "Insufficient Data!" });
+    };
 
     Projects.findOne({id}, (err, data) => {
         if (err) return response.send({ error: `Error trying to find project: ${err}` });
