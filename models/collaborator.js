@@ -10,14 +10,12 @@ const collaboratorSchema = new Schema({
     role: { type: String, required: true }
 });
 
-collaboratorSchema.pre('save', function(next) {
+collaboratorSchema.pre('save', async function(next) {
     const collaborator = this;
     if (!collaborator.isModified('password')) return next();
 
-    bcrypt.hash(collaborator.password, 10, (err, encrypted) => {
-        collaborator.password = encrypted;
-        return next();
-    });
+    collaborator.password = await bcrypt.hash(collaborator.password, 10);
+    return next()
 });
 
 module.exports = mongoose.model('Collaborator', collaboratorSchema);

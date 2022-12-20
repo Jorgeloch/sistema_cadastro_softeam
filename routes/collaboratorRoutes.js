@@ -3,59 +3,68 @@ const Collaborators = require('../models/collaborator');
 const router = express.Router();
 const bcrypt = require('bcrypt')
 
-router.get('/', (request, response) => {
-    Collaborators.find({}, (err, data) => {
-        if (err) return response.send({ error: `Error trying to connect to the database: ${err}` });
-        return response.send(data);
-    })
+
+router.get('/', async (request, response) => {
+    try{
+        const collaborators = await Collaborators.find({});
+        return response.send(collaborators);
+    }
+    catch (err) {
+        return response.send({ error: `Error trying to get collaborators: ${err}` });
+    }
 });
 
-router.post('/create', (request, response) => {
+router.post('/create', async (request, response) => {
     const { id, name, email, password, role } = request.body;
 
     if (!id || !name || !email || !password || !role) {
         return response.send({ error: "Insufficient Data!" });
     }
 
-    Collaborators.findOne({id}, (err, data) => {
-        if (err) return response.send({ error: `Error trying to find collaborator: ${err}` });
-        if (data) return response.send({ error: 'Collaborator already exist!' });
+    try {
+        if(await Collaborators.findOne({id})) return response.send({ error: 'Collaborator already exist!' });
 
-        Collaborators.create(request.body, (err, data) => {
-            if (err) return response.send({ error: `Error trying to create collaborator: ${err}`});
-            data.password = undefined;
-            return response.send(data);
-        });
-    });
+        const createdCollaborator = Collaborators.create(request.body);
+        createdCollaborator.password = undefined;
+
+        return response.send(createdCollaborator);
+    }
+    catch (err) {
+        return response.send( { error: `Error trying to create collaborator: ${err}` } );
+    }
+
 });
 
-router.post('/auth', (request, response) => {
+router.post('/auth', async (request, response) => {
     const {email, password} = request.body
 
     if (!email || !password) return response.send({ error: "Insuficient Data!" });
-    
-    Collaborators.findOne({email}, (err, data) => {
-        if (err) return response.send({ error: `Error trying to find a collaborator: ${err}`});
-        if (!data) return response.send( { error: "Collaborator not found!" } );
 
-        bcrypt.compare(password, data.password, (err, same) => {
-            if (err) return response.send({ error: `Error trying to verify password: ${err}` });
-            if (!same) return response.send( { error: "Invalid Password!" } );
+    try {
+        const collaborator = Collaborators.findOne({email}).select('+password');
+        if (!collaborator) return response.send({ error: "Collaborator not found!" });
 
-            data.password = undefined;
+        const pass_ok = await bcrypt.compare(password, collaborator.password);
+        if (!pass_ok) return response.send( { error: "Invalid Password!" } );
 
-            return response.send(data)
+        collaborator.password = undefined;
+        return collaborator
+    }
+    catch (err) {
+        return response.send({ error: `Error trying to authenticate a collaborator: ${err}` });
+    }
 
-        });
-    }).select('+password');
 });
 
-router.delete('/delete', (request, response) => {
+router.delete('/delete', async (request, response) => {
     const {id} = request.body;
-    Collaborators.findOneAndDelete({id}, (err, data) => {
-        if(err) return response.send(`Error trying to delete collaborator: ${err}`);
-        return response.send(data);
-    });
+    try {
+        const deletedCollaborator = await Collaborators.findOneAndDelete({id});
+        return response.send(deletedCollaborator)
+    }
+    catch (err){
+        return response.send({ error: `Error trying to delete collaborator: ${err}` });
+    }
 });
 
 module.exports = router;

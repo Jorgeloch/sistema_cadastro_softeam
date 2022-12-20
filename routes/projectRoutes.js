@@ -2,37 +2,43 @@ const express = require('express');
 const router = express.Router();
 const Projects = require('../models/project')
 
-router.get('/', (request, response) => {
-    Projects.find({}, (err, data) => {
-        if (err) return response.send({ error: `Error trying to connect to the database: ${err}` });
-        return response.send(data);
-    })
+router.get('/', async (request, response) => {
+    try{
+        const projects = await Projects.find({});
+        return response.send(projects);
+    }
+    catch (err) {
+        return response.send({ error: `Error trying to get projects: ${err}` });
+    }
 });
 
-router.post('/create', (request, response) => {
+router.post('/create', async (request, response) => {
     const { id, name, description, status, value, collaborators, companies } = request.body;
 
     if (!id || !name || !description || !status || !value || !collaborators || !companies) {
         return response.send({ error: "Insufficient Data!" });
     };
 
-    Projects.findOne({id}, (err, data) => {
-        if (err) return response.send({ error: `Error trying to find project: ${err}` });
-        if (data) return response.send({ error: 'Project already exist!' });
+    try {
+        if(Projects.findOne({id})) return response.send({ error: 'Project already exist!' });
 
-        Projects.create(request.body, (err, data) => {
-            if (err) return response.send({ error: `Error trying to create project: ${err}`});
-            return response.send(data);
-        });
-    });
+        const createdProject = await Projects.create(request.body);
+        return response.send(createdProject);
+    }
+    catch (err) {
+        return response.send({ error: `Error trying to create project: ${err}` });
+    }
 });
 
-router.delete('/delete', (request, response) => {
+router.delete('/delete', async (request, response) => {
     const {id} = request.body;
-    Projects.findOneAndDelete({id}, (err, data) => {
-        if(err) return response.send(`Error trying to delete project: ${err}`);
-        return response.send(data);
-    });
+    try {
+        const deletedProject = await Projects.findOneAndDelete({id});
+        return response.send(deletedProject)
+    }
+    catch (err){
+        return response.send({ error: `Error trying to delete project: ${err}` });
+    }
 });
 
 module.exports = router;

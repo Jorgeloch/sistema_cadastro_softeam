@@ -1,38 +1,45 @@
 const express = require('express');
+const company = require('../models/company');
 const Companies = require('../models/company')
 const router = express.Router();
 
-router.get('/', (request, response) => {
-    Companies.find({}, (err, data) => {
-        if (err) return response.send({ error: `Error trying to connect to the database: ${err}` });
-        return response.send(data);
-    })
+router.get('/', async (request, response) => {
+    try {
+        const company = Companies.find({});
+        return response.send(company);
+    }
+    catch (err) {
+        return response.send({ error: `Error trying to get companies: ${err}` });
+    }
 });
 
-router.post('/create', (request, response) => {
+router.post('/create', async (request, response) => {
     const { id, name, address, CNPJ, phone } = request.body;
 
     if (!id || !name || !address || !CNPJ || !phone) {
         return response.send({ error: "Insufficient Data!" });
     };
 
-    Companies.findOne({id}, (err, data) => {
-        if (err) return response.send({ error: `Error trying to find company: ${err}` });
-        if (data) return response.send({ error: 'Company already exist!' });
+    try {
+        if(Companies.findOne({id})) return response.send({ error: 'Company already exist!' });
 
-        Companies.create(request.body, (err, data) => {
-            if (err) return response.send({ error: `Error trying to create company: ${err}`});
-            return response.send(data);
-        });
-    });
+        const createdCompany = await Companies.create(request.body);
+        return response.send(createdCompany);
+    }
+    catch (err){
+        return response.send({ error: `Error trying to create company: ${err}` });
+    }
 });
 
-router.delete('/delete', (request, response) => {
+router.delete('/delete', async (request, response) => {
     const {id} = request.body;
-    Companies.findOneAndDelete({id}, (err, data) => {
-        if(err) return response.send(`Error trying to delete company: ${err}`);
-        return response.send(data);
-    });
+    try {
+        const deletedCompany = await Companies.findOneAndDelete({id});
+        return response.send(deletedCompany)
+    }
+    catch (err){
+        return response.send({ error: `Error trying to delete company: ${err}` });
+    }
 });
 
 module.exports = router;
