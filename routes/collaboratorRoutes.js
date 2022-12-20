@@ -1,6 +1,7 @@
 const express = require('express');
 const Collaborators = require('../models/collaborator');
 const router = express.Router();
+const bcrypt = require('bcrypt')
 
 router.get('/', (request, response) => {
     Collaborators.find({}, (err, data) => {
@@ -26,6 +27,27 @@ router.post('/create', (request, response) => {
             return response.send(data);
         });
     });
+});
+
+router.post('/auth', (request, response) => {
+    const {email, password} = request.body
+
+    if (!email || !password) return response.send({ error: "Insuficient Data!" });
+    
+    Collaborators.findOne({email}, (err, data) => {
+        if (err) return response.send({ error: `Error trying to find a collaborator: ${err}`});
+        if (!data) return response.send( { error: "Collaborator not found!" } );
+
+        bcrypt.compare(password, data.password, (err, same) => {
+            if (err) return response.send({ error: `Error trying to verify password: ${err}` });
+            if (!same) return response.send( { error: "Invalid Password!" } );
+
+            data.password = undefined;
+
+            return response.send(data)
+
+        });
+    }).select('+password');
 });
 
 router.delete('/delete', (request, response) => {
