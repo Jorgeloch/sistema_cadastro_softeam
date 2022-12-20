@@ -4,9 +4,10 @@ const router = express.Router();
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const auth = require('../middlewares/auth')
+const config = require('../config/config')
 
 const createUserToken = (userID) => {
-    return jwt.sign({ id: userID }, "senha1234", { expiresIn: '1d' });
+    return jwt.sign({ id: userID }, config.JWTPassword, { expiresIn: config.JWTExpiresIn });
 }
 
 

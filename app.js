@@ -1,14 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const config = require('./config/config')
 
 const app = express();
 
 //connection with mongoDB string -> mongodb+srv://user_db:njB6sH0zRaRI291Q@clustersofteam.iqsjr3x.mongodb.net/?retryWrites=true&w=majority
-
-const url = "mongodb+srv://user_db:njB6sH0zRaRI291Q@clustersofteam.iqsjr3x.mongodb.net/?retryWrites=true&w=majority";
-
-mongoose.connect(url);
+mongoose.connect(config.DBConnectionString);
 mongoose.set('strictQuery', true);
 
 mongoose.connection.on('error', (err) => {
