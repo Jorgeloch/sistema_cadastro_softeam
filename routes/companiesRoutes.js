@@ -1,6 +1,5 @@
 const express = require('express');
-const company = require('../models/company');
-const Companies = require('../models/company')
+const Companies = require('../models/company');
 const router = express.Router();
 
 router.get('/', async (request, response) => {
@@ -14,14 +13,14 @@ router.get('/', async (request, response) => {
 });
 
 router.post('/create', async (request, response) => {
+    
     const { id, name, address, CNPJ, phone } = request.body;
-
     if (!id || !name || !address || !CNPJ || !phone) {
         return response.send({ error: "Insufficient Data!" });
     };
-
+    
     try {
-        if(Companies.findOne({id})) return response.send({ error: 'Company already exist!' });
+        if(await Companies.findOne({id})) return response.send({ error: 'Company already exist!' });
 
         const createdCompany = await Companies.create(request.body);
         return response.send(createdCompany);

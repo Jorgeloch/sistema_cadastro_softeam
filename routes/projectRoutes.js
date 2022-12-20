@@ -20,7 +20,7 @@ router.post('/create', async (request, response) => {
     };
 
     try {
-        if(Projects.findOne({id})) return response.send({ error: 'Project already exist!' });
+        if(await Projects.findOne({id})) return response.send({ error: 'Project already exist!' });
 
         const createdProject = await Projects.create(request.body);
         return response.send(createdProject);

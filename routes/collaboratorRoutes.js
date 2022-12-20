@@ -24,7 +24,7 @@ router.post('/create', async (request, response) => {
     try {
         if(await Collaborators.findOne({id})) return response.send({ error: 'Collaborator already exist!' });
 
-        const createdCollaborator = Collaborators.create(request.body);
+        const createdCollaborator = await Collaborators.create(request.body);
         createdCollaborator.password = undefined;
 
         return response.send(createdCollaborator);
@@ -41,14 +41,14 @@ router.post('/auth', async (request, response) => {
     if (!email || !password) return response.send({ error: "Insuficient Data!" });
 
     try {
-        const collaborator = Collaborators.findOne({email}).select('+password');
+        const collaborator = await Collaborators.findOne({email}).select('+password');
         if (!collaborator) return response.send({ error: "Collaborator not found!" });
 
         const pass_ok = await bcrypt.compare(password, collaborator.password);
         if (!pass_ok) return response.send( { error: "Invalid Password!" } );
 
         collaborator.password = undefined;
-        return collaborator
+        return response.send(collaborator);
     }
     catch (err) {
         return response.send({ error: `Error trying to authenticate a collaborator: ${err}` });
