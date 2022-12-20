@@ -1,43 +1,45 @@
 const express = require('express');
 const Companies = require('../models/company');
 const router = express.Router();
+const auth = require('../middlewares/auth')
 
-router.get('/', async (request, response) => {
+router.get('/', auth, async (request, response) => {
     try {
         const company = Companies.find({});
         return response.send(company);
     }
     catch (err) {
-        return response.send({ error: `Error trying to get companies: ${err}` });
+        return response.status(500).send({ error: `Error trying to get companies: ${err}` });
     }
 });
 
-router.post('/create', async (request, response) => {
+router.post('/create', auth, async (request, response) => {
     
-    const { id, name, address, CNPJ, phone } = request.body;
-    if (!id || !name || !address || !CNPJ || !phone) {
-        return response.send({ error: "Insufficient Data!" });
+    const { name, address, CNPJ, phone } = request.body;
+    if (!name || !address || !CNPJ || !phone) {
+        return response.status(400).send({ error: "Insufficient Data!" });
     };
     
     try {
-        if(await Companies.findOne({id})) return response.send({ error: 'Company already exist!' });
+        if(await Companies.findOne({CNPJ})) return response.status(400).send({ error: 'Company already exist!' });
 
         const createdCompany = await Companies.create(request.body);
-        return response.send(createdCompany);
+        return response.status(201).send(createdCompany);
     }
     catch (err){
-        return response.send({ error: `Error trying to create company: ${err}` });
+        return response.status(500).send({ error: `Error trying to create company: ${err}` });
     }
 });
 
-router.delete('/delete', async (request, response) => {
-    const {id} = request.body;
+router.delete('/delete', auth, async (request, response) => {
+    const {CNPJ} = request.body;
+    if(!CNPJ) return response.status(400).send({ error: "Insuficient Data!"});
     try {
-        const deletedCompany = await Companies.findOneAndDelete({id});
+        const deletedCompany = await Companies.findOneAndDelete({CNPJ});
         return response.send(deletedCompany)
     }
     catch (err){
-        return response.send({ error: `Error trying to delete company: ${err}` });
+        return response.status(500).send({ error: `Error trying to delete company: ${err}` });
     }
 });
 

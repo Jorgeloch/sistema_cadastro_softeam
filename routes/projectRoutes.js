@@ -1,43 +1,45 @@
 const express = require('express');
 const router = express.Router();
 const Projects = require('../models/project')
+const auth = require('../middlewares/auth')
 
-router.get('/', async (request, response) => {
+router.get('/', auth, async (request, response) => {
     try{
         const projects = await Projects.find({});
         return response.send(projects);
     }
     catch (err) {
-        return response.send({ error: `Error trying to get projects: ${err}` });
+        return response.status(500).send({ error: `Error trying to get projects: ${err}` });
     }
 });
 
-router.post('/create', async (request, response) => {
-    const { id, name, description, status, value, collaborators, companies } = request.body;
+router.post('/create', auth, async (request, response) => {
+    const { name, description, status, value, collaborators, companies } = request.body;
 
-    if (!id || !name || !description || !status || !value || !collaborators || !companies) {
-        return response.send({ error: "Insufficient Data!" });
+    if (!name || !description || !status || !value || !collaborators || !companies) {
+        return response.status(400).send({ error: "Insufficient Data!" });
     };
 
     try {
-        if(await Projects.findOne({id})) return response.send({ error: 'Project already exist!' });
+        if(await Projects.findOne({name})) return response.status(400).send({ error: 'Project already exist!' });
 
         const createdProject = await Projects.create(request.body);
-        return response.send(createdProject);
+        return response.status(201).send(createdProject);
     }
     catch (err) {
-        return response.send({ error: `Error trying to create project: ${err}` });
+        return response.status(500).send({ error: `Error trying to create project: ${err}` });
     }
 });
 
-router.delete('/delete', async (request, response) => {
-    const {id} = request.body;
+router.delete('/delete', auth, async (request, response) => {
+    const {name} = request.body;
+    if(!name) return response.status(400).send({ error: "Insuficient Data!"});
     try {
-        const deletedProject = await Projects.findOneAndDelete({id});
+        const deletedProject = await Projects.findOneAndDelete({name});
         return response.send(deletedProject)
     }
     catch (err){
-        return response.send({ error: `Error trying to delete project: ${err}` });
+        return response.status(500).send({ error: `Error trying to delete project: ${err}` });
     }
 });
 
