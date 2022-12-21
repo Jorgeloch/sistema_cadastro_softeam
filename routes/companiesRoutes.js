@@ -5,7 +5,7 @@ const auth = require('../middlewares/auth')
 
 router.get('/', auth, async (request, response) => {
     try {
-        const company = Companies.find({});
+        const company = await Companies.find({});
         return response.send(company);
     }
     catch (err) {
@@ -14,7 +14,6 @@ router.get('/', auth, async (request, response) => {
 });
 
 router.post('/create', auth, async (request, response) => {
-    
     const { name, address, CNPJ, phone } = request.body;
     if (!name || !address || !CNPJ || !phone) {
         return response.status(400).send({ error: "Insufficient Data!" });
@@ -28,6 +27,32 @@ router.post('/create', auth, async (request, response) => {
     }
     catch (err){
         return response.status(500).send({ error: `Error trying to create company: ${err}` });
+    }
+});
+
+router.post('/updatePhone',auth, async (request, response) => {
+    const {name, phone} = request.body;
+    if(!name || !phone) return response.status(400).send({ error: "Insuficient Data!" });
+    try {
+        if(!(await Companies.findOne({name}))) return response.status(404).send({ error:"Company not found" });
+        const updatedCompany = await Companies.findOneAndUpdate({name}, {phone}, {new: true});
+        return response.send(updatedCompany);
+    }
+    catch (err) {
+        return response.status(500).send({ error: `Error trying to update company phone's number: ${err}`});
+    }
+});
+
+router.post('/updateAddress',auth, async (request, response) => {
+    const {name, address} = request.body;
+    if(!name || !address) return response.status(400).send({ error: "Insuficient Data!" });
+    try {
+        if(!(await Companies.findOne({name}))) return response.status(404).send({ error:"Company not found" });
+        const updatedCompany = await Companies.findOneAndUpdate({name}, {address}, {new: true});
+        return response.send(updatedCompany);
+    }
+    catch (err) {
+        return response.status(500).send({ error: `Error trying to update company's address: ${err}`});
     }
 });
 

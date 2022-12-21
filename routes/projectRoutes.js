@@ -31,6 +31,19 @@ router.post('/create', auth, async (request, response) => {
     }
 });
 
+router.post('/update', auth, async (request, response) => {
+    const {name, status} = request.body;
+    if(!name || !status) return response.status(400).send({ error: "Insuficient Data!" });
+    try {
+        if (!(await Projects.findOne({name}))) return response.status(404).send(({ error: "Project not found" }));
+        const updatedProject = await Projects.findOneAndUpdate({name}, {status}, {new: true});
+        response.send(updatedProject);
+    } 
+    catch (err) {
+        return response.status(500).send({ error: `Error trying to update project status: ${err}` });
+    }
+});
+
 router.delete('/delete', auth, async (request, response) => {
     const {name} = request.body;
     if(!name) return response.status(400).send({ error: "Insuficient Data!"});

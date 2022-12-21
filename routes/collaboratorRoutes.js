@@ -63,6 +63,19 @@ router.post('/auth', async (request, response) => {
 
 });
 
+router.post('/updateRole',auth, async (request, response) => {
+    const {email, role} = request.body;
+    if(!email || !role) return response.status(400).send({ error: "Insuficient Data!" });
+    try {
+        if(!(await Collaborators.findOne({email}))) return response.status(404).send({ error:"Collaborator not found" });
+        const updatedCollaborator = await Collaborators.findOneAndUpdate({email}, {role}, {new: true});
+        return response.send(updatedCollaborator);
+    }
+    catch (err) {
+        return response.status(500).send({ error: `Error trying to update Collaborator's role: ${err}`});
+    }
+});
+
 router.delete('/delete', auth, async (request, response) => {
     const {email} = request.body;
     if(!email) return response.status(400).send({ error: "Insuficient Data!"});
