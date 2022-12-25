@@ -2,6 +2,7 @@ const express = require('express');
 const Companies = require('../models/company');
 const router = express.Router();
 const auth = require('../middlewares/auth')
+const validateCompany = require('../validations/validateCompany')
 
 router.get('/', auth, async (request, response) => {
     try {
@@ -14,12 +15,11 @@ router.get('/', auth, async (request, response) => {
 });
 
 router.post('/create', auth, async (request, response) => {
-    const { name, address, CNPJ, phone } = request.body;
-    if (!name || !address || !CNPJ || !phone) {
-        return response.status(400).send({ error: "Insufficient Data!" });
-    };
+    const {error, value} = await validateCompany(request.body);
+    if (error) return response.send(error.details)
     
     try {
+        const { CNPJ } = request.body;
         if(await Companies.findOne({CNPJ})) return response.status(400).send({ error: 'Company already exist!' });
 
         const createdCompany = await Companies.create(request.body);

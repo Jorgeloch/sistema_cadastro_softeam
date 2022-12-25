@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const config = require('../config/config')
+const config = require('../config-data/config')
 
 const auth = (request, response, next) => {
     const tokenHeader = request.headers.auth;

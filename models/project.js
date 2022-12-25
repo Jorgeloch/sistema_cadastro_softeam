@@ -6,8 +6,8 @@ const projectSchema = new Schema({
     description: { type: String, required: false }, 
     status: { type: String, required: true }, 
     value: { type: Number, required: true }, 
-    collaborators: [{ type: Schema.Types.OjectId, ref: "Collaborator"}],
-    companies: [{ type: Schema.Types.OjectId, ref: "Company"}]
+    collaborators: [{ type: Schema.Types.ObjectId, ref: "Collaborator"}],
+    companies: [{ type: Schema.Types.ObjectId, ref: "Company"}]
 });
 
 module.exports = mongoose.model('Project', projectSchema);
