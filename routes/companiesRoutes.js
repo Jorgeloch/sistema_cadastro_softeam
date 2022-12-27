@@ -16,7 +16,7 @@ router.get('/', auth, async (request, response) => {
 
 router.post('/create', auth, async (request, response) => {
     const {error, value} = await validateCompany(request.body);
-    if (error) return response.send(error.details)
+    if (error) return response.status(400).send(error.details);
     
     try {
         const { CNPJ } = request.body;
@@ -30,9 +30,9 @@ router.post('/create', auth, async (request, response) => {
     }
 });
 
-router.post('/updatePhone',auth, async (request, response) => {
-    const {name, phone} = request.body;
-    if(!name || !phone) return response.status(400).send({ error: "Insuficient Data!" });
+router.post('/update',auth, async (request, response) => {
+    const { id } = request.body;
+    if(!id) return response.status(400).send({ error: "Insuficient Data!" });
     try {
         if(!(await Companies.findOne({name}))) return response.status(404).send({ error:"Company not found" });
         const updatedCompany = await Companies.findOneAndUpdate({name}, {phone}, {new: true});
@@ -40,19 +40,6 @@ router.post('/updatePhone',auth, async (request, response) => {
     }
     catch (err) {
         return response.status(500).send({ error: `Error trying to update company phone's number: ${err}`});
-    }
-});
-
-router.post('/updateAddress',auth, async (request, response) => {
-    const {name, address} = request.body;
-    if(!name || !address) return response.status(400).send({ error: "Insuficient Data!" });
-    try {
-        if(!(await Companies.findOne({name}))) return response.status(404).send({ error:"Company not found" });
-        const updatedCompany = await Companies.findOneAndUpdate({name}, {address}, {new: true});
-        return response.send(updatedCompany);
-    }
-    catch (err) {
-        return response.status(500).send({ error: `Error trying to update company's address: ${err}`});
     }
 });
 

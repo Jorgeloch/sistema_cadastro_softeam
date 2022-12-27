@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router();
 const Projects = require('../models/project')
 const auth = require('../middlewares/auth')
+const validateProject = require('../validations/validateProject')
 
 router.get('/', auth, async (request, response) => {
     try{
-        const projects = await Projects.find({});
+        const projects = await Projects.find({}).populate('collaborators').populate('companies');
         return response.send(projects);
     }
     catch (err) {
@@ -14,16 +15,15 @@ router.get('/', auth, async (request, response) => {
 });
 
 router.post('/create', auth, async (request, response) => {
-    const { name, description, status, value, collaborators, companies } = request.body;
-
-    if (!name || !description || !status || !value || !collaborators || !companies) {
-        return response.status(400).send({ error: "Insufficient Data!" });
-    };
+    const {error, value} = validateProject(request.body);
+    if(error) return response.status(400).send({ error: `error trying to validate project: ${error.details}` });
 
     try {
+        const { name } = request.body;
+
         if(await Projects.findOne({name})) return response.status(400).send({ error: 'Project already exist!' });
 
-        const createdProject = await Projects.create(request.body);
+        const createdProject = await (await (await Projects.create(request.body)).populate('collaborators')).populate('companies');
         return response.status(201).send(createdProject);
     }
     catch (err) {
@@ -45,10 +45,10 @@ router.post('/update', auth, async (request, response) => {
 });
 
 router.delete('/delete', auth, async (request, response) => {
-    const {name} = request.body;
-    if(!name) return response.status(400).send({ error: "Insuficient Data!"});
+    const {_id} = request.body;
+    if(!_id) return response.status(400).send({ error: "Insuficient Data!"});
     try {
-        const deletedProject = await Projects.findOneAndDelete({name});
+        const deletedProject = await Projects.findByIdAndRemove(_id).populate('collaborators').populate('companies');
         return response.send(deletedProject)
     }
     catch (err){

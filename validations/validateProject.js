@@ -4,9 +4,9 @@ const projectSchema = Joi.object({
     name: Joi.string().required(),
     description: Joi.string(), 
     status: Joi.string().required(), 
-    value: Joi.string().pattern(new RegExp('/^([R][\$])?[\d]{1,3}(?:[\.][\d]{3})+([\,][\d]{2})?$/')).required(), 
-    collaborators: Joi.array().items(Joi.string().pattern(new RegExp('/^[A-Fa-f0-9]{24}$/'))),
-    companies: Joi.array().items(Joi.string().pattern(new RegExp('/^[A-Fa-f0-9]{24}$/')))
+    value: Joi.string().regex(/^([R][\$])?[\d]{1,3}((?:[\.][\d]{3})+)?([\,][\d]{2})?$/).required(), 
+    collaborators: Joi.array().items(Joi.string().regex(/^[A-Fa-f0-9]{24}$/)),
+    companies: Joi.array().items(Joi.string().regex(/^[A-Fa-f0-9]{24}$/))
 });
 
 const validate = (schema) => (payload) => {
