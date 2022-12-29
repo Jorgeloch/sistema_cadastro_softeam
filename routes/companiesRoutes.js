@@ -31,11 +31,11 @@ router.post('/create', auth, async (request, response) => {
 });
 
 router.post('/update',auth, async (request, response) => {
-    const { id } = request.body;
-    if(!id) return response.status(400).send({ error: "Insuficient Data!" });
+    const { _id, name, address, CNPJ, phone } = request.body;
+    if(!_id) return response.status(400).send({ error: "Insuficient Data!" });
     try {
-        if(!(await Companies.findOne({name}))) return response.status(404).send({ error:"Company not found" });
-        const updatedCompany = await Companies.findOneAndUpdate({name}, {phone}, {new: true});
+        if(!(await Companies.findById(_id))) return response.status(404).send({ error:"Company not found" });
+        const updatedCompany = await Companies.findByIdAndUpdate(_id, {name, address, CNPJ, phone}, {new: true});
         return response.send(updatedCompany);
     }
     catch (err) {
@@ -44,10 +44,10 @@ router.post('/update',auth, async (request, response) => {
 });
 
 router.delete('/delete', auth, async (request, response) => {
-    const {CNPJ} = request.body;
-    if(!CNPJ) return response.status(400).send({ error: "Insuficient Data!"});
+    const {_id} = request.body;
+    if(!_id) return response.status(400).send({ error: "Insuficient Data!"});
     try {
-        const deletedCompany = await Companies.findOneAndDelete({CNPJ});
+        const deletedCompany = await Companies.findByIdAndDelete(_id);
         return response.send(deletedCompany)
     }
     catch (err){

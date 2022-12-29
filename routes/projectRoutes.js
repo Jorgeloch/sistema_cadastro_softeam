@@ -32,11 +32,11 @@ router.post('/create', auth, async (request, response) => {
 });
 
 router.post('/update', auth, async (request, response) => {
-    const {name, status} = request.body;
-    if(!name || !status) return response.status(400).send({ error: "Insuficient Data!" });
+    const {_id, name, description, status, value, collaborators, companies} = request.body;
+    if(!_id) return response.status(400).send({ error: "Insuficient Data!" });
     try {
-        if (!(await Projects.findOne({name}))) return response.status(404).send(({ error: "Project not found" }));
-        const updatedProject = await Projects.findOneAndUpdate({name}, {status}, {new: true});
+        if (!(await Projects.findById(_id))) return response.status(404).send(({ error: "Project not found" }));
+        const updatedProject = await Projects.findByIdAndUpdate(_id, {name, description, status, value, collaborators, companies}, {new: true}).populate('collaborators').populate('companies');
         response.send(updatedProject);
     } 
     catch (err) {

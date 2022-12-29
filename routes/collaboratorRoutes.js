@@ -5,7 +5,8 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const auth = require('../middlewares/auth')
 const config = require('../config-data/config')
-const validateCollaborator = require('../validations/validateCollaborator')
+const validateCollaborator = require('../validations/validateCollaborator');
+const { update } = require('../models/company');
 
 const createUserToken = (userID) => {
     return jwt.sign({ id: userID }, config.JWTPassword, { expiresIn: config.JWTExpiresIn });
@@ -24,7 +25,7 @@ router.get('/', auth, async (request, response) => {
 
 router.post('/create', auth, async (request, response) => {
     const {error, value} = await validateCollaborator(request.body);
-    if (error) return response.send(error.details);
+    if (error) return response.status(400).send(error.details);
 
     try {
         const { email } = request.body;
@@ -54,7 +55,7 @@ router.post('/auth', async (request, response) => {
         if (!pass_ok) return response.status(401).send( { error: "Invalid Password!" } );
 
         collaborator.password = undefined;
-        return response.send({ collaborator, token: createUserToken(collaborator.id)});
+        return response.send({ collaborator, token: createUserToken(collaborator.id) });
     }
     catch (err) {
         return response.status(500).send({ error: `Error trying to authenticate a collaborator: ${err}` });
@@ -62,12 +63,26 @@ router.post('/auth', async (request, response) => {
 
 });
 
-router.post('/updateRole',auth, async (request, response) => {
-    const {email, role} = request.body;
-    if(!email || !role) return response.status(400).send({ error: "Insuficient Data!" });
+router.post('/update',auth, async (request, response) => {
+    const {_id, name, email, role} = request.body;
+    if(!_id) return response.status(400).send({ error: "Insuficient Data!" });
     try {
-        if(!(await Collaborators.findOne({email}))) return response.status(404).send({ error:"Collaborator not found" });
-        const updatedCollaborator = await Collaborators.findOneAndUpdate({email}, {role}, {new: true});
+        if(!(await Collaborators.findById(_id))) return response.status(404).send({ error:"Collaborator not found" });
+        const updatedCollaborator = await Collaborators.findByIdAndUpdate(_id, { name, email, role }, { new: true });
+        return response.send(updatedCollaborator);
+    }
+    catch (err) {
+        return response.status(500).send({ error: `Error trying to update Collaborator's role: ${err}`});
+    }
+});
+
+router.post('/updatePassword', auth, async (request, response) => {
+    const {_id, newPassword} = request.body;
+    if (!_id) return response.status(400).send({ error: "Insuficent Data!" });
+    try {
+        if(!(await Collaborators.findById(_id))) return response.status(404).send({ error:"Collaborator not found" });
+        const updatedCollaborator = await Collaborators.findByIdAndUpdate(_id, { password: newPassword }, { new: true });
+        updatedCollaborator.password = undefined;
         return response.send(updatedCollaborator);
     }
     catch (err) {
