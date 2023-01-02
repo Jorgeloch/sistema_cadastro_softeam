@@ -25,7 +25,7 @@ router.get('/', auth, async (request, response) => {
 
 router.post('/create', auth, async (request, response) => {
     const {error, value} = await validateCollaborator(request.body);
-    if (error) return response.status(400).send(error.details);
+    if (error) return response.status(400).send({ error: `error trying to validate collaborator: ${error.details}` });
 
     try {
         const { email } = request.body;
@@ -49,7 +49,7 @@ router.post('/auth', async (request, response) => {
 
     try {
         const collaborator = await Collaborators.findOne({email}).select('+password');
-        if (!collaborator) return response.status(400).send({ error: "Collaborator not found!" });
+        if (!collaborator) return response.status(404).send({ error: "Collaborator not found!" });
 
         const pass_ok = await bcrypt.compare(password, collaborator.password);
         if (!pass_ok) return response.status(401).send( { error: "Invalid Password!" } );
@@ -63,8 +63,9 @@ router.post('/auth', async (request, response) => {
 
 });
 
-router.post('/update',auth, async (request, response) => {
-    const {_id, name, email, role} = request.body;
+router.put('/update/:_id',auth, async (request, response) => {
+    const { _id } = request.params;
+    const { name, email, role } = request.body;
     if(!_id) return response.status(400).send({ error: "Insuficient Data!" });
     try {
         if(!(await Collaborators.findById(_id))) return response.status(404).send({ error:"Collaborator not found" });
@@ -76,7 +77,7 @@ router.post('/update',auth, async (request, response) => {
     }
 });
 
-router.post('/updatePassword', auth, async (request, response) => {
+router.put('/updatePassword', auth, async (request, response) => {
     const {_id, newPassword} = request.body;
     if (!_id) return response.status(400).send({ error: "Insuficent Data!" });
     try {
@@ -91,10 +92,10 @@ router.post('/updatePassword', auth, async (request, response) => {
 });
 
 router.delete('/delete', auth, async (request, response) => {
-    const {email} = request.body;
-    if(!email) return response.status(400).send({ error: "Insuficient Data!"});
+    const {_id} = request.query;
+    if(!_id) return response.status(400).send({ error: "Insuficient Data!"});
     try {
-        const deletedCollaborator = await Collaborators.findOneAndDelete({email});
+        const deletedCollaborator = await Collaborators.findOneAndDelete({_id});
         deletedCollaborator.password = undefined;
         return response.send(deletedCollaborator);
     }

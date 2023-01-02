@@ -1,7 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const config = require('./config-data/config')
+const config = require('./config-data/config');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 
 const app = express();
 
@@ -32,6 +34,7 @@ app.use('/', indexRoute)
 app.use('/project', projectRoute);
 app.use('/collaborator', collaboratorRoute);
 app.use('/company', companiesRoute);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
 app.listen(3000, () => console.log("Running server"));

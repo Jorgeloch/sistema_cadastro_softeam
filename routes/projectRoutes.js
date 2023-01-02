@@ -31,8 +31,10 @@ router.post('/create', auth, async (request, response) => {
     }
 });
 
-router.post('/update', auth, async (request, response) => {
-    const {_id, name, description, status, value, collaborators, companies} = request.body;
+router.put('/update/:id', auth, async (request, response) => {
+    const { _id } = request.params;
+    const { name, description, status, value, collaborators, companies} = request.body;
+
     if(!_id) return response.status(400).send({ error: "Insuficient Data!" });
     try {
         if (!(await Projects.findById(_id))) return response.status(404).send(({ error: "Project not found" }));
@@ -45,7 +47,7 @@ router.post('/update', auth, async (request, response) => {
 });
 
 router.delete('/delete', auth, async (request, response) => {
-    const {_id} = request.body;
+    const {_id} = request.query;
     if(!_id) return response.status(400).send({ error: "Insuficient Data!"});
     try {
         const deletedProject = await Projects.findByIdAndRemove(_id).populate('collaborators').populate('companies');
