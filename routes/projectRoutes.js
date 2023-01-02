@@ -31,7 +31,7 @@ router.post('/create', auth, async (request, response) => {
     }
 });
 
-router.put('/update/:id', auth, async (request, response) => {
+router.put('/update/:_id', auth, async (request, response) => {
     const { _id } = request.params;
     const { name, description, status, value, collaborators, companies} = request.body;
 
