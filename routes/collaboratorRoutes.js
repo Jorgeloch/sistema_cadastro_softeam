@@ -4,6 +4,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const auth = require('../middlewares/auth')
+const authUpdate = require('../middlewares/authUpdate')
 const config = require('../config-data/config')
 const validateCollaborator = require('../validations/validateCollaborator');
 const { update } = require('../models/company');
@@ -66,7 +67,7 @@ router.post('/auth', async (request, response) => {
 
 });
 
-router.put('/update/:_id',auth, async (request, response) => {
+router.put('/update/:_id', authUpdate, async (request, response) => {
     const { _id } = request.params;
     const { name, email, role } = request.body;
     if(!_id) return response.status(400).send({ error: "Insuficient Data!" });
@@ -80,7 +81,7 @@ router.put('/update/:_id',auth, async (request, response) => {
     }
 });
 
-router.put('/updatePassword/:_id', auth, async (request, response) => {
+router.put('/updatePassword/:_id', authUpdate, async (request, response) => {
     const {_id} = request.params;
     const { oldPassword, newPassword } = request.body;
 
@@ -88,21 +89,6 @@ router.put('/updatePassword/:_id', auth, async (request, response) => {
 
     try {
         const collaborator = await Collaborators.findById(_id).select('+password');
-
-        const authHeader = request.headers.authorization;
-
-        if(!authHeader) return response.status(401).send({ error:"Token wasn't sent" });
-
-        if(!authHeader.startsWith("Bearer ")){
-            return response.status(401).send({ error:"Token wasn't sent" });
-        }
-        else{
-            const token = authHeader.substring(7, authHeader.length);
-            const decoded = jwt.verify(token, config.JWTPassword);
-            console.log(decoded.id);
-            console.log((collaborator._id))
-            if(decoded.id != collaborator._id) return response.status(401).send({ error: "unauthorized to modify this collaborator's password" });
-        }
 
         if(!collaborator) return response.status(404).send({ error: "Collaborator not found" });
         if(!(bcrypt.compare(oldPassword, collaborator.password))) response.status(401).send({ error: "Invalid Password"});
