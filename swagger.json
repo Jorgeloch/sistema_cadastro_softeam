@@ -476,6 +476,32 @@
                         "required": true
                     }
                 ],
+                "requestBody": {
+                    "content":{
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/collaborators"
+                            },
+                            "examples": {
+                                "company": {
+                                    "value": {
+                                        "name": "company",
+                                        "address": {
+                                            "country": "BR",
+                                            "state": "SP",
+                                            "city": "Sao Paulo",
+                                            "street": "Rua B",
+                                            "location": 150,
+                                            "zipCode": "70000-000"
+                                        },
+                                        "CNPJ": "11.111.111/1111-11",
+                                        "phone": "(11)91111-1111"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "400": {
                         "description": "Insuficient Data!"
@@ -822,6 +848,32 @@
                         "required": true
                     }
                 ],
+                "requestBody": {
+                    "content":{
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/collaborators"
+                            },
+                            "examples": {
+                                "project": {
+                                    "value": {
+                                        "_id": "projectID",
+                                        "name": "Project",
+                                        "description": "description 1",
+                                        "status": "finished",
+                                        "value": "R$3000,00",
+                                        "collaborators": [
+                                            "collaboratorID"
+                                        ],
+                                        "companies": [
+                                            "companyID"
+                                        ]   
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "400": {
                         "description": "Insuficient Data!"
