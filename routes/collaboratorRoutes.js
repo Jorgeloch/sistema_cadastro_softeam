@@ -43,12 +43,14 @@ router.post('/create', auth, async (request, response) => {
 });
 
 router.post('/auth', async (request, response) => {
+
     const {email, password} = request.body
 
     if (!email || !password) return response.status(400).send({ error: "Insuficient Data!" });
 
     try {
         const collaborator = await Collaborators.findOne({email}).select('+password');
+
         if (!collaborator) return response.status(404).send({ error: "Collaborator not found!" });
 
         const pass_ok = await bcrypt.compare(password, collaborator.password);
@@ -77,14 +79,37 @@ router.put('/update/:_id',auth, async (request, response) => {
     }
 });
 
-router.put('/updatePassword', auth, async (request, response) => {
-    const {_id, newPassword} = request.body;
-    if (!_id) return response.status(400).send({ error: "Insuficent Data!" });
+router.put('/updatePassword/:_id', auth, async (request, response) => {
+    const {_id} = request.params;
+    const { oldPassword, newPassword } = request.body;
+
+    if (!_id || !oldPassword || !newPassword) return response.status(400).send({ error: "Insuficent Data!" });
+
     try {
-        if(!(await Collaborators.findById(_id))) return response.status(404).send({ error:"Collaborator not found" });
-        const updatedCollaborator = await Collaborators.findByIdAndUpdate(_id, { password: newPassword }, { new: true });
-        updatedCollaborator.password = undefined;
-        return response.send(updatedCollaborator);
+        const collaborator = await Collaborators.findById(_id).select('+password');
+
+        const authHeader = request.headers.authorization;
+
+        if(!authHeader) return response.status(401).send({ error:"Token wasn't sent" });
+
+        if(!authHeader.startsWith("Bearer ")){
+            return response.status(401).send({ error:"Token wasn't sent" });
+        }
+        else{
+            const token = authHeader.substring(7, authHeader.length);
+            const decoded = jwt.verify(token, config.JWTPassword);
+
+            if(decoded.id !== collaborator._id) return response.status(401).send({ error: "unauthorized to modify this collaborator's password" });
+        }
+
+        if(!collaborator) return response.status(404).send({ error: "Collaborator not found" });
+        if(!(bcrypt.compare(oldPassword, collaborator.password))) response.status(401).send({ error: "Invalid Password"});
+
+        collaborator.password = newPassword;
+        await collaborator.save();
+        collaborator.password = undefined;
+
+        return response.send(collaborator);
     }
     catch (err) {
         return response.status(500).send({ error: `Error trying to update Collaborator's role: ${err}`});
