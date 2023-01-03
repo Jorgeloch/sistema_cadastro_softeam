@@ -7,6 +7,7 @@ const auth = require('../middlewares/auth')
 const config = require('../config-data/config')
 const validateCollaborator = require('../validations/validateCollaborator');
 const { update } = require('../models/company');
+const { string } = require('joi');
 
 const createUserToken = (userID) => {
     return jwt.sign({ id: userID }, config.JWTPassword, { expiresIn: config.JWTExpiresIn });
@@ -98,8 +99,9 @@ router.put('/updatePassword/:_id', auth, async (request, response) => {
         else{
             const token = authHeader.substring(7, authHeader.length);
             const decoded = jwt.verify(token, config.JWTPassword);
-
-            if(decoded.id !== collaborator._id) return response.status(401).send({ error: "unauthorized to modify this collaborator's password" });
+            console.log(decoded.id);
+            console.log((collaborator._id))
+            if(decoded.id != collaborator._id) return response.status(401).send({ error: "unauthorized to modify this collaborator's password" });
         }
 
         if(!collaborator) return response.status(404).send({ error: "Collaborator not found" });
@@ -121,6 +123,9 @@ router.delete('/delete', auth, async (request, response) => {
     if(!_id) return response.status(400).send({ error: "Insuficient Data!"});
     try {
         const deletedCollaborator = await Collaborators.findOneAndDelete({_id});
+
+        if(!deletedCollaborator) return response.status(404).send({error: "Collaborator not found!"});
+
         deletedCollaborator.password = undefined;
         return response.send(deletedCollaborator);
     }

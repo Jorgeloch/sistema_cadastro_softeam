@@ -51,6 +51,9 @@ router.delete('/delete', auth, async (request, response) => {
     if(!_id) return response.status(400).send({ error: "Insuficient Data!"});
     try {
         const deletedCompany = await Companies.findByIdAndDelete(_id);
+
+        if(!deletedCompany) return response.status(404).send({error: "Company not found!"});
+        
         return response.send(deletedCompany)
     }
     catch (err){

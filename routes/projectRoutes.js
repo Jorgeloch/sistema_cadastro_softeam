@@ -51,7 +51,10 @@ router.delete('/delete', auth, async (request, response) => {
     if(!_id) return response.status(400).send({ error: "Insuficient Data!"});
     try {
         const deletedProject = await Projects.findByIdAndRemove(_id).populate('collaborators').populate('companies');
-        return response.send(deletedProject)
+
+        if(!deletedProject) return response.status(404).send({error: "Project not found!"});
+        
+        return response.send(deletedProject);
     }
     catch (err){
         return response.status(500).send({ error: `Error trying to delete project: ${err}` });

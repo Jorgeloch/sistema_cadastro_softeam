@@ -68,6 +68,132 @@
                 }
             }
         },
+        "/collaborator/auth": {
+            "post": {
+                "summary": "generate a JWT for a collaborator",
+                "description": "given a email and a password, generate a JWT for a collaborator",
+                "tags": ["Collaborators"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/collaborators"
+                            },
+                            "examples": {
+                                "collaborator": {
+                                    "value": {
+                                        "email": "collaborator@email.com",
+                                        "password": "password"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "Insuficient Data!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                    },
+                    "401": {
+                        "description": "Invalid Password!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Invalid Password!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Collaborator not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Collaborator not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error trying to authenticate collaborator",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Error trying to connect with database"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "collaborator" : {
+                                            "$ref": "#/components/schemas/collaborators"
+                                        },
+                                        "token": {
+                                            "type":"string"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "validCollaborator": {
+                                        "value": {
+                                            "collaborator": {
+                                                "_id": "collaboratorID",
+                                                "name": "collaborator",
+                                                "email": "collaborator@email.com",
+                                                "role": "Back-end developer"
+                                            },
+                                            "token": "validToken"  
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/collaborator/create": {
             "post": {
                 "summary": "create one collaborator",
@@ -112,7 +238,21 @@
                         }
                     },
                     "404": {
-                        "description": "Collaborator not found!"
+                        "description": "Collaborator not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Collaborator not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     "500": {
                         "description": "Error trying to create collaborator",
@@ -188,13 +328,173 @@
                 },
                 "responses": {
                     "400": {
-                        "description": "Insuficient Data!"
+                        "description": "Insuficient Data!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Collaborator not found!"
+                        "description": "Collaborator not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Collaborator not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     "500": {
                         "description": "Error trying to update collaborator",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Error trying to connect with database"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/collaborators"
+                                },
+                                "examples": {
+                                    "collaborator": {
+                                        "value": {
+                                            "_id": "collaboratorID",
+                                            "name": "collaborator",
+                                            "email": "collaborator@email.com",
+                                            "role": "Back-end developer"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/collaborator/updatePassword/{_id}": {
+            "put": {
+                "summary": "Update the password of an existing collaborator",
+                "description": "Update the password of an existing collaborator",
+                "tags": ["Collaborators"],
+                "security": [{"bearerAuth": []}],
+                "parameters": [
+                    {
+                        "name": "_id",
+                        "in": "path",
+                        "description": "ID to find collaborator",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content":{
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "oldPassword": {
+                                        "type": "string"
+                                    },
+                                    "newPassword": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "examples": {
+                                "collaborator": {
+                                    "value": {
+                                        "oldPassword": "password",
+                                        "newPassword": "password1"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "Insuficient Data!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Invalid Password"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Collaborator not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Collaborator not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error trying to update collaborator's password",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -250,7 +550,38 @@
                 ],
                 "responses": {
                     "400": {
-                        "description": "Insuficient Data!"
+                        "description": "Insuficient Data!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Collaborator not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Collaborator not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     "500": {
                         "description": "Error trying to delete collaborator",
@@ -480,7 +811,7 @@
                     "content":{
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/collaborators"
+                                "$ref": "#/components/schemas/company"
                             },
                             "examples": {
                                 "company": {
@@ -504,10 +835,38 @@
                 },
                 "responses": {
                     "400": {
-                        "description": "Insuficient Data!"
+                        "description": "Insuficient Data!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Company not found!"
+                        "description": "Company not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Company not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     "500": {
                         "description": "Error trying to update company",
@@ -573,7 +932,38 @@
                 ],
                 "responses": {
                     "400": {
-                        "description": "Insuficient Data!"
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Company not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Company not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     "500": {
                         "description": "Error trying to delete company",
@@ -852,7 +1242,7 @@
                     "content":{
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/collaborators"
+                                "$ref": "#/components/schemas/projects"
                             },
                             "examples": {
                                 "project": {
@@ -876,13 +1266,41 @@
                 },
                 "responses": {
                     "400": {
-                        "description": "Insuficient Data!"
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Company not found!"
+                        "description": "Project not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Project not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     "500": {
-                        "description": "Error trying to update company",
+                        "description": "Error trying to update project",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -963,10 +1381,41 @@
                 ],
                 "responses": {
                     "400": {
-                        "description": "Insuficient Data!"
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Project not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     "500": {
-                        "description": "Error trying to delete company",
+                        "description": "Error trying to delete project",
                         "content": {
                             "application/json": {
                                 "schema": {
