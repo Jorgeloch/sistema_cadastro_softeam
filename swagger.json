@@ -1,0 +1,1598 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "SofTeam Projects API",
+        "description": "This API was made to handle Softeam project information",
+        "version": "1.0.0"
+    },
+    "servers":[
+        {
+            "url": "http://localhost:3000",
+            "description": "test server"
+        }
+    ],
+    "paths": {
+        "/collaborator": {
+            "get": {
+                "summary": "Return all collaborators working at Softeam",
+                "description": "Return all collaborators working at Softeam",
+                "tags": ["Collaborators"],
+                "security": [{"bearerAuth": []}],
+                "responses": {
+                    "500": {
+                        "description": "Error trying to get collaborators",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Error trying to connect with database"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref":"#/components/schemas/collaborators"
+                                    }
+                                },
+                                "examples": {
+                                    "collaborators": {
+                                        "value": [
+                                            {
+                                                "name": "collaborator 1",
+                                                "email": "collaborator1@email.com",
+                                                "role": "Back-end developer"
+                                            },
+                                            {
+                                                "name": "collaborator 2",
+                                                "email": "collaborator2@email.com",
+                                                "role": "Front-end developer"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/collaborator/auth": {
+            "post": {
+                "summary": "generate a JWT for a collaborator",
+                "description": "given a email and a password, generate a JWT for a collaborator",
+                "tags": ["Collaborators"],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/collaborators"
+                            },
+                            "examples": {
+                                "collaborator": {
+                                    "value": {
+                                        "email": "collaborator@email.com",
+                                        "password": "password"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "Insuficient Data!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                    },
+                    "401": {
+                        "description": "Invalid Password!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Invalid Password!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Collaborator not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Collaborator not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error trying to authenticate collaborator",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Error trying to connect with database"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "collaborator" : {
+                                            "$ref": "#/components/schemas/collaborators"
+                                        },
+                                        "token": {
+                                            "type":"string"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "validCollaborator": {
+                                        "value": {
+                                            "collaborator": {
+                                                "_id": "collaboratorID",
+                                                "name": "collaborator",
+                                                "email": "collaborator@email.com",
+                                                "role": "Back-end developer"
+                                            },
+                                            "token": "validToken"  
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/collaborator/create": {
+            "post": {
+                "summary": "create one collaborator",
+                "description": "create one collaborator",
+                "tags": ["Collaborators"],
+                "security": [{"bearerAuth": []}],
+                "requestBody": {
+                    "content":{
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/collaborators"
+                            },
+                            "examples": {
+                                "collaborator": {
+                                    "value": {
+                                        "name": "collaborator",
+                                        "email": "collaborator@email.com",
+                                        "password": "password",
+                                        "role": "Back-end developer"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Collaborator not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Collaborator not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error trying to create collaborator",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Error trying to connect with database"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Collaborator Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/collaborators"
+                                },
+                                "examples": {
+                                    "collaborator": {
+                                        "value": {
+                                            "_id":"collaboratorID",
+                                            "name": "collaborator",
+                                            "email": "collaborator@email.com",
+                                            "role": "Back-end developer"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/collaborator/update/{_id}": {
+            "put": {
+                "summary": "Update one existing collaborator",
+                "description": "Update one existing collaborator",
+                "tags": ["Collaborators"],
+                "security": [{"bearerAuth": []}],
+                "parameters": [
+                    {
+                        "name": "_id",
+                        "in": "path",
+                        "description": "ID to find collaborator",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content":{
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/collaborators"
+                            },
+                            "examples": {
+                                "collaborator": {
+                                    "value": {
+                                        "name": "collaborator",
+                                        "email": "collaborator@email.com",
+                                        "role": "Back-end developer"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "Insuficient Data!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Collaborator not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Collaborator not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error trying to update collaborator",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Error trying to connect with database"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/collaborators"
+                                },
+                                "examples": {
+                                    "collaborator": {
+                                        "value": {
+                                            "_id": "collaboratorID",
+                                            "name": "collaborator",
+                                            "email": "collaborator@email.com",
+                                            "role": "Back-end developer"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/collaborator/updatePassword/{_id}": {
+            "put": {
+                "summary": "Update the password of an existing collaborator",
+                "description": "Update the password of an existing collaborator",
+                "tags": ["Collaborators"],
+                "security": [{"bearerAuth": []}],
+                "parameters": [
+                    {
+                        "name": "_id",
+                        "in": "path",
+                        "description": "ID to find collaborator",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content":{
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "oldPassword": {
+                                        "type": "string"
+                                    },
+                                    "newPassword": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "examples": {
+                                "collaborator": {
+                                    "value": {
+                                        "oldPassword": "password",
+                                        "newPassword": "password1"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "Insuficient Data!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Invalid Password"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Collaborator not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Collaborator not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error trying to update collaborator's password",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Error trying to connect with database"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/collaborators"
+                                },
+                                "examples": {
+                                    "collaborator": {
+                                        "value": {
+                                            "_id": "collaboratorID",
+                                            "name": "collaborator",
+                                            "email": "collaborator@email.com",
+                                            "role": "Back-end developer"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/collaborator/delete": {
+            "delete":{
+                "summary": "Delete an existing collaborator",
+                "description": "Delete an existing collaborator",
+                "tags": ["Collaborators"],
+                "security": [{"bearerAuth": []}],
+                "parameters": [
+                    {
+                        "name": "_id",
+                        "in": "query",
+                        "description": "ID from the collaborator that you want to delete",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Insuficient Data!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Collaborator not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Collaborator not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error trying to delete collaborator",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Error trying to connect with database"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "type": "object",
+                                        "$ref": "#/components/schemas/collaborators"
+                                    },
+                                    "examples": {
+                                        "collaborator": {
+                                            "value": {
+                                                "_id": "collaboratorID",
+                                                "name": "collaborator",
+                                                "email": "collaborator@email.com",
+                                                "role": "Back-end developer"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                    }
+                }
+            }
+        },
+        "/company": {
+            "get": {
+                "summary": "Get all the companies",
+                "description": "Get all the companies signed at the softeam platform",
+                "tags": ["Companies"],
+                "security": [{"bearerAuth": []}],
+                "responses": {
+                    "500": {
+                        "description": "Error trying to get collaborators",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Error trying to connect with database"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type":"array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/companies"
+                                    }
+                                },
+                                "examples": {
+                                    "companies": {
+                                        "value": [
+                                            {
+                                                "name": "company",
+                                                "address": {
+                                                    "country": "BR",
+                                                    "state": "SP",
+                                                    "city": "Sao Paulo",
+                                                    "street": "Rua B",
+                                                    "location": 150,
+                                                    "zipCode": "70000-000"
+                                                },
+                                                "CNPJ": "11.111.111/1111-11",
+                                                "phone": "(11)91111-1111"
+                                            },
+                                            {
+                                                "name": "company 2",
+                                                "address": {
+                                                    "country": "US",
+                                                    "state": "FL",
+                                                    "city": "Orlando",
+                                                    "street": "any street",
+                                                    "location": 150,
+                                                    "zipCode": "70000-000"
+                                                },
+                                                "CNPJ": "01.111.112/1111-12",
+                                                "phone": "5555-555"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/company/create": {
+            "post": {
+                "summary": "Create one company",
+                "description": "Create one company at the Softeam platform",
+                "tags": ["Companies"],
+                "security": [{"bearerAuth": []}],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/companies"
+                            },
+                            "examples": {
+                                "company": {
+                                    "value": {
+                                        "name": "company",
+                                        "address": {
+                                            "country": "BR",
+                                            "state": "SP",
+                                            "city": "Sao Paulo",
+                                            "street": "Rua B",
+                                            "location": 150,
+                                            "zipCode": "70000-000"
+                                        },
+                                        "CNPJ": "11.111.111/1111-11",
+                                        "phone": "(11)91111-1111"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error trying to create company",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Error trying to connect with database"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Company Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/companies"
+                                },
+                                "examples": {
+                                    "company": {
+                                        "value": {
+                                            "name": "company",
+                                            "address": {
+                                                "country": "BR",
+                                                "state": "SP",
+                                                "city": "Sao Paulo",
+                                                "street": "Rua B",
+                                                "location": 150,
+                                                "zipCode": "70000-000"
+                                            },
+                                            "CNPJ": "11.111.111/1111-11",
+                                            "phone": "(11)91111-1111"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/company/update/{_id}": {
+            "put": {
+                "summary": "Update one existing company",
+                "description": "Update one existing company",
+                "tags": ["Companies"],
+                "security": [{"bearerAuth": []}],
+                "parameters": [
+                    {
+                        "name": "_id",
+                        "in": "path",
+                        "description": "ID to find company",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content":{
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/company"
+                            },
+                            "examples": {
+                                "company": {
+                                    "value": {
+                                        "name": "company",
+                                        "address": {
+                                            "country": "BR",
+                                            "state": "SP",
+                                            "city": "Sao Paulo",
+                                            "street": "Rua B",
+                                            "location": 150,
+                                            "zipCode": "70000-000"
+                                        },
+                                        "CNPJ": "11.111.111/1111-11",
+                                        "phone": "(11)91111-1111"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "Insuficient Data!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Company not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Company not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error trying to update company",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Error trying to connect with database"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/companies"
+                                },
+                                "examples": {
+                                    "company": {
+                                        "value": {
+                                            "name": "company",
+                                            "address": {
+                                                "country": "BR",
+                                                "state": "SP",
+                                                "city": "Sao Paulo",
+                                                "street": "Rua B",
+                                                "location": 150,
+                                                "zipCode": "70000-000"
+                                            },
+                                            "CNPJ": "11.111.111/1111-11",
+                                            "phone": "(11)91111-1111"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/company/delete": {
+            "delete": {
+                "summary": "Delete an existing company",
+                "description": "Delete an existing company",
+                "tags": ["Companies"],
+                "security": [{"bearerAuth": []}],
+                "parameters": [
+                    {
+                        "name": "_id",
+                        "in": "query",
+                        "description": "ID from the company that you want to delete",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Company not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Company not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error trying to delete company",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Error trying to connect with database"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/companies"
+                                },
+                                "examples": {
+                                    "company": {
+                                        "value": {
+                                            "_id": "companyID",
+                                            "name": "company",
+                                            "address": {
+                                                "country": "BR",
+                                                "state": "SP",
+                                                "city": "Sao Paulo",
+                                                "street": "Rua B",
+                                                "location": 150,
+                                                "zipCode": "70000-000"
+                                            },
+                                            "CNPJ": "11.111.111/1111-11",
+                                            "phone": "(11)91111-1111"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/project": {
+            "get": {
+                "summary": "Get all the projects",
+                "description": "get all the projects that the Softeam is involved",
+                "tags": ["Projects"],
+                "security": [{"bearerAuth": []}],
+                "responses": {
+                    "500": {
+                        "description": "Error trying to get projects",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Error trying to connect with database"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type":"array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/projects"
+                                    }
+                                },
+                                "examples": {
+                                    "projects": {
+                                        "value": [
+                                            {
+                                                "_id": "projectID",
+                                                "name": "Project",
+                                                "description": "description 1",
+                                                "status": "finished",
+                                                "value": "R$3000,00",
+                                                "collaborators": [
+                                                    {
+                                                        "_id":"collaboratorID",
+                                                        "name": "collaborator",
+                                                        "email": "collaborator@email.com",
+                                                        "role": "Back-end developer"
+                                                    }
+                                                ],
+                                                "companies": [
+                                                    {
+                                                        "_id": "companyID",
+                                                        "name": "company",
+                                                        "address": {
+                                                            "country": "BR",
+                                                            "state": "SP",
+                                                            "city": "Sao Paulo",
+                                                            "street": "Rua B",
+                                                            "location": 150,
+                                                            "zipCode": "70000-000"
+                                                        },
+                                                        "CNPJ": "11.111.111/1111-11",
+                                                        "phone": "(11)91111-1111"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/project/create": {
+            "post": {
+                "summary": "create one project",
+                "description": "Create one project at the Softeam platform",
+                "tags": ["Projects"],
+                "security": [{"bearerAuth": []}],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/projects"
+                            },
+                            "examples": {
+                                "project": {
+                                    "value": {
+                                        "_id": "projectID",
+                                        "name": "Project",
+                                        "description": "description 1",
+                                        "status": "finished",
+                                        "value": "R$3000,00",
+                                        "collaborators": [
+                                            {
+                                                "_id":"collaboratorID",
+                                                "name": "collaborator",
+                                                "email": "collaborator@email.com",
+                                                "role": "Back-end developer"
+                                            }
+                                        ],
+                                        "companies": [
+                                            {
+                                                "_id": "companyID",
+                                                "name": "company",
+                                                "address": {
+                                                    "country": "BR",
+                                                    "state": "SP",
+                                                    "city": "Sao Paulo",
+                                                    "street": "Rua B",
+                                                    "location": 150,
+                                                    "zipCode": "70000-000"
+                                                },
+                                                "CNPJ": "11.111.111/1111-11",
+                                                "phone": "(11)91111-1111"
+                                            }
+                                        ]   
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error trying to create project",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Error trying to connect with database"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "project Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/projects"
+                                },
+                                "examples": {
+                                    "project": {
+                                        "value": {
+                                            "_id": "projectID",
+                                            "name": "Project",
+                                            "description": "description 1",
+                                            "status": "finished",
+                                            "value": "R$3000,00",
+                                            "collaborators": [
+                                                {
+                                                    "_id":"collaboratorID",
+                                                    "name": "collaborator",
+                                                    "email": "collaborator@email.com",
+                                                    "role": "Back-end developer"
+                                                }
+                                            ],
+                                            "companies": [
+                                                {
+                                                    "_id": "companyID",
+                                                    "name": "company",
+                                                    "address": {
+                                                        "country": "BR",
+                                                        "state": "SP",
+                                                        "city": "Sao Paulo",
+                                                        "street": "Rua B",
+                                                        "location": 150,
+                                                        "zipCode": "70000-000"
+                                                    },
+                                                    "CNPJ": "11.111.111/1111-11",
+                                                    "phone": "(11)91111-1111"
+                                                }
+                                            ]   
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/project/update/{_id}": {
+            "put": {
+                "summary": "Update one existing project",
+                "description": "Update one existing project",
+                "tags": ["Projects"],
+                "security": [{"bearerAuth": []}],
+                "parameters": [
+                    {
+                        "name": "_id",
+                        "in": "path",
+                        "description": "ID to find project",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content":{
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/projects"
+                            },
+                            "examples": {
+                                "project": {
+                                    "value": {
+                                        "_id": "projectID",
+                                        "name": "Project",
+                                        "description": "description 1",
+                                        "status": "finished",
+                                        "value": "R$3000,00",
+                                        "collaborators": [
+                                            "collaboratorID"
+                                        ],
+                                        "companies": [
+                                            "companyID"
+                                        ]   
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Project not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error trying to update project",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Error trying to connect with database"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/projects"
+                                },
+                                "examples": {
+                                    "project": {
+                                        "value": {
+                                            "_id": "projectID",
+                                            "name": "Project",
+                                            "description": "description 1",
+                                            "status": "finished",
+                                            "value": "R$3000,00",
+                                            "collaborators": [
+                                                {
+                                                    "_id":"collaboratorID",
+                                                    "name": "collaborator",
+                                                    "email": "collaborator@email.com",
+                                                    "role": "Back-end developer"
+                                                }
+                                            ],
+                                            "companies": [
+                                                {
+                                                    "_id": "companyID",
+                                                    "name": "company",
+                                                    "address": {
+                                                        "country": "BR",
+                                                        "state": "SP",
+                                                        "city": "Sao Paulo",
+                                                        "street": "Rua B",
+                                                        "location": 150,
+                                                        "zipCode": "70000-000"
+                                                    },
+                                                    "CNPJ": "11.111.111/1111-11",
+                                                    "phone": "(11)91111-1111"
+                                                }
+                                            ]   
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/project/delete": {
+            "put": {
+                "summary": "Delete an existing project",
+                "description": "Delete an existing project",
+                "tags": ["Projects"],
+                "security": [{"bearerAuth": []}],
+                "parameters": [
+                    {
+                        "name": "_id",
+                        "in": "query",
+                        "description": "ID from the project that you want to delete",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Insuficient Data!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Project not found!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error trying to delete project",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/error"
+                                },
+                                "examples": {
+                                    "error": {
+                                        "value": {
+                                            "error": "Error trying to connect with database"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "$ref": "#/components/schemas/projects"
+                                },
+                                "examples": {
+                                    "project": {
+                                        "value": {
+                                            "_id": "projectID",
+                                            "name": "Project",
+                                            "description": "description 1",
+                                            "status": "finished",
+                                            "value": "R$3000,00",
+                                            "collaborators": [
+                                                {
+                                                    "_id":"collaboratorID",
+                                                    "name": "collaborator",
+                                                    "email": "collaborator@email.com",
+                                                    "role": "Back-end developer"
+                                                }
+                                            ],
+                                            "companies": [
+                                                {
+                                                    "_id": "companyID",
+                                                    "name": "company",
+                                                    "address": {
+                                                        "country": "BR",
+                                                        "state": "SP",
+                                                        "city": "Sao Paulo",
+                                                        "street": "Rua B",
+                                                        "location": 150,
+                                                        "zipCode": "70000-000"
+                                                    },
+                                                    "CNPJ": "11.111.111/1111-11",
+                                                    "phone": "(11)91111-1111"
+                                                }
+                                            ]   
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "error": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "type": "string"
+                    }
+                }
+            },
+            "collaborators": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "role": {
+                        "type": "string"
+                    }
+                }
+            },
+            "companies": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "address": {
+                        "type": "object",
+                        "properties": {
+                            "country": {
+                                "type":"string"
+                            },
+                            "state": {
+                                "type":"string"
+                            },
+                            "city": {
+                                "type":"string"
+                            },
+                            "street": {
+                                "type":"string"
+                            },
+                            "location": {
+                                "type":"number"
+                            },
+                            "zipCode": {
+                                "type":"string"
+                            },
+                            "complement": {
+                                "type":"string"
+                            }
+                        }
+                    },
+                    "CNPJ": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    }
+                }
+            },
+            "projects": {
+                "type": "object",
+                "properties": {
+                    "_id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "value": {
+                        "type": "string"
+                    },
+                    "collaborators": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/collaborators"
+                        }
+                    },
+                    "companies": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/companies"
+                        }
+                    }
+                }
+            }
+        },
+        "securitySchemes" : {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    }
+}
