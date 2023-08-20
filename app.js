@@ -1,14 +1,15 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const config = require('./config-data/config');
+const dotenv = require('dotenv');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 
 const app = express();
+dotenv.config();
 
-//connection with mongoDB string -> mongodb+srv://user_db:njB6sH0zRaRI291Q@clustersofteam.iqsjr3x.mongodb.net/?retryWrites=true&w=majority
-mongoose.connect(config.DBConnectionString);
+const database = process.env.MONGO_URI; 
+mongoose.connect(database);
 mongoose.set('strictQuery', true);
 
 mongoose.connection.on('error', (err) => {
@@ -25,15 +26,10 @@ mongoose.connection.on('connected', () => console.log('Application has been conn
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-const indexRoute = require('./routes/index');
-const collaboratorRoute = require('./routes/collaboratorRoutes');
-const companiesRoute = require('./routes/companiesRoutes');
-const projectRoute = require('./routes/projectRoutes');
-
-app.use('/', indexRoute)
-app.use('/project', projectRoute);
-app.use('/collaborator', collaboratorRoute);
-app.use('/company', companiesRoute);
+app.use('/',  require('./routes/index'))
+app.use('/project', require('./routes/projectRoutes'));
+app.use('/collaborator', require('./routes/collaboratorRoutes'));
+app.use('/company', require('./routes/companiesRoutes'));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 

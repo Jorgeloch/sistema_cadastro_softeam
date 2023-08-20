@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
-const config = require('../config-data/config')
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const auth = (request, response, next) => {
     const authHeader = request.headers.authorization;
@@ -12,7 +14,7 @@ const auth = (request, response, next) => {
     else{
         const token = authHeader.substring(7, authHeader.length);
 
-        jwt.verify(token, config.JWTPassword, (err, decoded) => {
+        jwt.verify(token, process.env.JWTPassword, (err, decoded) => {
             if (err) return response.status(401).send({ error: `Error trying to verify token: ${err}`});
             response.locals.authData = decoded;
             return next();

@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
-const config = require('../config-data/config');
+const dotenv = require('dotenv');
 const Collaborators = require('../models/collaborator');
+
+dotenv.config();
 
 const authUpdate = async (request, response, next) => {
     const {_id} = request.params;
@@ -15,7 +17,7 @@ const authUpdate = async (request, response, next) => {
         const token = authHeader.substring(7, authHeader.length);
         const collaborator = await Collaborators.findById(_id);
 
-        jwt.verify(token, config.JWTPassword, (err, decoded) => {
+        jwt.verify(token, process.env.JWTPassword, (err, decoded) => {
             if (err) return response.status(401).send({ error: `Error trying to verify token: ${err}`});
             if(decoded.id != collaborator._id) return response.status(401).send({ error: "unauthorized to modify this collaborator's password" });
 

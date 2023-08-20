@@ -1,12 +1,8 @@
 const express = require('express');
+const { getIndex, postIndex } = require('../controllers/indexController');
 const router = express.Router();
 
-router.get('/', (request, response) => {
-    return response.send({message: "tudo ok com o metodo GET da raiz"});
-});
-
-router.post('/', (request, response) => {
-    return response.send({message: "tudo ok com o metodo POST da raiz"});
-});
+router.get('/', getIndex);
+router.post('/', postIndex);
 
 module.exports = router;
